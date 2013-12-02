@@ -44,14 +44,16 @@ public abstract class Snappy {
 		
 		public Snappy newInstance() {
 			if (nativeAvailable == 0) {
-				try {
-					System.loadLibrary("snappy");
-					nativeAvailable = 1;
-				} catch (UnsatisfiedLinkError e) {
-					nativeAvailable = 2;
-				}
-			}
-			
+                try {
+                    System.loadLibrary("snappy");
+                    nativeAvailable = 1;
+                } catch (UnsatisfiedLinkError e) {
+                    nativeAvailable = 2;
+                } catch (SecurityException e) { // occurs when it's not allowed to load native libraries like Google App Engine
+                    nativeAvailable = 2;
+                }
+            }
+
 			if (nativeAvailable == 1) {
 				return newInstanceNative();
 			} else if (nativeAvailable == 2) {
