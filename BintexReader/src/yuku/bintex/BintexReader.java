@@ -98,20 +98,20 @@ public class BintexReader implements Closeable {
 	}
 	
 	/**
-	 * Baca pake 8-bit atau 16-bit
+	 * Read 8-bit or 16-bit string.
 	 * 
-	 * byte pertama menentukan
+	 * The first byte determines:
 	 * 0x01 = 8 bit short
 	 * 0x02 = 16 bit short
 	 * 0x11 = 8 bit long
 	 * 0x12 = 16 bit long
 	 */
 	public String readAutoString() throws IOException {
-		int jenis = readUint8();
+		int kind = readUint8();
 		int len = 0;
-		if (jenis == 0x01 || jenis == 0x02) {
+		if (kind == 0x01 || kind == 0x02) {
 			len = readUint8();
-		} else if (jenis == 0x11 || jenis == 0x12) {
+		} else if (kind == 0x11 || kind == 0x12) {
 			len = readInt();
 		}
 		
@@ -121,14 +121,14 @@ public class BintexReader implements Closeable {
 			buf_char_.set(buf_char);
 		}
 		
-		if (jenis == 0x01 || jenis == 0x11) {
+		if (kind == 0x01 || kind == 0x11) {
 			for (int i = 0; i < len; i++) {
 				buf_char[i] = (char) is_.read();
 			}
 			pos_ += len;
 			
 			return new String(buf_char, 0, len);
-		} else if (jenis == 0x02 || jenis == 0x12) {
+		} else if (kind == 0x02 || kind == 0x12) {
 			for (int i = 0; i < len; i++) {
 				buf_char[i] = readCharWithoutIncreasingPos();
 			}
