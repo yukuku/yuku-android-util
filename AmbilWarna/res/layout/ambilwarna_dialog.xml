@@ -9,11 +9,12 @@
         android:id="@+id/ambilwarna_viewContainer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_gravity="center"
         android:clipToPadding="false"
         android:paddingBottom="@dimen/ambilwarna_spacer"
         android:paddingLeft="@dimen/ambilwarna_spacer"
         android:paddingRight="@dimen/ambilwarna_spacer"
-        android:paddingTop="@dimen/ambilwarna_spacer" android:layout_gravity="center">
+        android:paddingTop="@dimen/ambilwarna_spacer" >
 
         <yuku.ambilwarna.AmbilWarnaKotak
             android:id="@+id/ambilwarna_viewSatBri"
@@ -31,7 +32,30 @@
             android:src="@drawable/ambilwarna_hue" />
 
         <ImageView
+            android:id="@+id/ambilwarna_viewTransparency"
+            android:layout_width="@dimen/ambilwarna_hueWidth"
+            android:layout_height="@dimen/ambilwarna_hsvHeight"
+            android:layout_marginLeft="@dimen/ambilwarna_spacer"
+            android:layout_toRightOf="@id/ambilwarna_viewHue"
+            android:scaleType="fitXY"
+            android:src="@drawable/ambilwarna_transparent" />
+
+        <View
+            android:id="@+id/ambilwarna_overlay"
+            android:layout_width="@dimen/ambilwarna_hueWidth"
+            android:layout_height="@dimen/ambilwarna_hsvHeight"
+            android:layout_marginLeft="@dimen/ambilwarna_spacer"
+            android:layout_toRightOf="@id/ambilwarna_viewHue" />
+
+        <ImageView
             android:id="@+id/ambilwarna_cursor"
+            android:layout_width="9dp"
+            android:layout_height="9dp"
+            android:scaleType="matrix"
+            android:src="@drawable/ambilwarna_cursor" />
+
+        <ImageView
+            android:id="@+id/ambilwarna_cursorTransparency"
             android:layout_width="9dp"
             android:layout_height="9dp"
             android:scaleType="matrix"

@@ -4,6 +4,7 @@ import android.app.*;
 import android.content.*;
 import android.content.DialogInterface.OnCancelListener;
 import android.graphics.*;
+import android.graphics.drawable.GradientDrawable;
 import android.view.*;
 import android.widget.*;
 
@@ -18,11 +19,15 @@ public class AmbilWarnaDialog {
 	final View viewHue;
 	final AmbilWarnaKotak viewSatVal;
 	final ImageView viewCursor;
+	final ImageView viewTransCursor;
 	final View viewOldColor;
 	final View viewNewColor;
+	final View transparentOverlay;
 	final ImageView viewTarget;
+	final ImageView viewTransparent;
 	final ViewGroup viewContainer;
-	final float[] currentColorHsv = new float[3];
+	final float[] currentColorHsv = new float[4];
+	
 
 	/**
 	 * create an AmbilWarnaDialog. call this only from OnCreateDialog() or from a background thread.
@@ -36,7 +41,7 @@ public class AmbilWarnaDialog {
 	 */
 	public AmbilWarnaDialog(final Context context, int color, OnAmbilWarnaListener listener) {
 		this.listener = listener;
-		Color.colorToHSV(color, currentColorHsv);
+		Color.colorToHSV(color, new float[] {currentColorHsv[1], currentColorHsv[2],currentColorHsv[3]});
 
 		final View view = LayoutInflater.from(context).inflate(R.layout.ambilwarna_dialog, null);
 		viewHue = view.findViewById(R.id.ambilwarna_viewHue);
@@ -46,7 +51,10 @@ public class AmbilWarnaDialog {
 		viewNewColor = view.findViewById(R.id.ambilwarna_warnaBaru);
 		viewTarget = (ImageView) view.findViewById(R.id.ambilwarna_target);
 		viewContainer = (ViewGroup) view.findViewById(R.id.ambilwarna_viewContainer);
-
+		transparentOverlay = view.findViewById(R.id.ambilwarna_overlay);
+		viewTransCursor = (ImageView) view.findViewById(R.id.ambilwarna_cursorTransparency);
+		viewTransparent = (ImageView) view.findViewById(R.id.ambilwarna_viewTransparency);
+		
 		viewSatVal.setHue(getHue());
 		viewOldColor.setBackgroundColor(color);
 		viewNewColor.setBackgroundColor(color);
@@ -68,7 +76,38 @@ public class AmbilWarnaDialog {
 					viewSatVal.setHue(getHue());
 					moveCursor();
 					viewNewColor.setBackgroundColor(getColor());
+					updateTransparentView();
+					return true;
+				}
+				return false;
+			}
+		});
+		viewTransparent.setOnTouchListener(new View.OnTouchListener() {
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				if ((event.getAction() == MotionEvent.ACTION_MOVE)
+						|| (event.getAction() == MotionEvent.ACTION_DOWN)
+						|| (event.getAction() == MotionEvent.ACTION_UP)) {
 
+					float y = event.getY();
+					if (y < 0.f) {
+						y = 0.f;
+					}
+					if (y > viewTransparent.getMeasuredHeight())
+					{
+						y = viewTransparent.getMeasuredHeight() - 0.001f; // to avoid looping from end to start.
+					}
+					float trans = 255.f - ((255.f / viewHue.getMeasuredHeight()) * y);
+					if (trans == 255.f) {
+						trans = 0.f;
+					}
+					AmbilWarnaDialog.this.setTransparent(trans);
+
+					// update view
+					moveTransCursor();
+					int col = AmbilWarnaDialog.this.getColor();
+					int c = Color.argb((int) trans, Color.red(col), Color.green(col), Color.blue(col));
+					viewNewColor.setBackgroundColor(c);
 					return true;
 				}
 				return false;
@@ -134,7 +173,9 @@ public class AmbilWarnaDialog {
 		vto.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
 			@Override public void onGlobalLayout() {
 				moveCursor();
+				moveTransCursor();
 				moveTarget();
+				updateTransparentView();
 				view.getViewTreeObserver().removeGlobalOnLayoutListener(this);
 			}
 		});
@@ -160,32 +201,53 @@ public class AmbilWarnaDialog {
 		viewTarget.setLayoutParams(layoutParams);
 	}
 
+	protected void moveTransCursor() {
+		float y = this.viewTransparent.getMeasuredHeight() - ((this.getTrans() * this.viewTransparent.getMeasuredHeight()) / 255.f);
+		if (y == this.viewTransparent.getMeasuredHeight()) {
+			y = 0.f;
+		}
+		final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) this.viewTransCursor.getLayoutParams();
+		layoutParams.leftMargin = (int) (this.viewTransparent.getLeft() - Math.floor(this.viewTransCursor.getMeasuredWidth() / 2) - this.viewContainer.getPaddingLeft());
+
+		layoutParams.topMargin = (int) ((this.viewTransparent.getTop() + y) - Math.floor(this.viewTransCursor.getMeasuredHeight() / 2) - this.viewContainer.getPaddingTop());
+
+		this.viewTransCursor.setLayoutParams(layoutParams);
+	}
+
 	private int getColor() {
-		return Color.HSVToColor(currentColorHsv);
+		final int hsv = Color.HSVToColor(new float[] {currentColorHsv[1], currentColorHsv[2],currentColorHsv[3]});
+		return Color.argb((int) this.currentColorHsv[0], Color.red(hsv), Color.green(hsv), Color.blue(hsv));
 	}
 
 	private float getHue() {
+		return currentColorHsv[1];
+	}
+
+	private float getTrans() {
 		return currentColorHsv[0];
 	}
 
 	private float getSat() {
-		return currentColorHsv[1];
-	}
-
-	private float getVal() {
 		return currentColorHsv[2];
 	}
 
+	private float getVal() {
+		return currentColorHsv[3];
+	}
+
 	private void setHue(float hue) {
-		currentColorHsv[0] = hue;
+		currentColorHsv[1] = hue;
 	}
 
 	private void setSat(float sat) {
-		currentColorHsv[1] = sat;
+		currentColorHsv[2] = sat;
 	}
 
+	private void setTransparent(float trans) {
+		currentColorHsv[0] = trans;
+	}
 	private void setVal(float val) {
-		currentColorHsv[2] = val;
+		currentColorHsv[3] = val;
 	}
 
 	public void show() {
@@ -194,5 +256,12 @@ public class AmbilWarnaDialog {
 
 	public AlertDialog getDialog() {
 		return dialog;
+	}
+	
+	private void updateTransparentView(){
+		final GradientDrawable gd = new GradientDrawable(GradientDrawable.Orientation.TOP_BOTTOM, new int[] {
+				Color.HSVToColor(new float[]{ getHue(), getSat(), getVal()}), Color.TRANSPARENT
+		});
+		AmbilWarnaDialog.this.transparentOverlay.setBackgroundDrawable(gd);
 	}
 }
