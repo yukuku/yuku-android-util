@@ -8,6 +8,8 @@ import android.graphics.drawable.GradientDrawable;
 import android.view.*;
 import android.widget.*;
 
+import java.util.Arrays;
+
 public class AmbilWarnaDialog {
 	public interface OnAmbilWarnaListener {
 		void onCancel(AmbilWarnaDialog dialog);
@@ -26,8 +28,16 @@ public class AmbilWarnaDialog {
 	final ImageView viewTarget;
 	final ImageView viewTransparent;
 	final ViewGroup viewContainer;
-	final float[] currentColorHsv = new float[4];
+	final float[] currentColorHsv = new float[3];
+	float alpha;
 	
+	private void logCCH()
+	{
+		String out = alpha + ", ";
+		for(float i : currentColorHsv)
+			out += i + ", ";
+		android.util.Log.d("AmbilWarnaDialog", out);
+	}
 
 	/**
 	 * create an AmbilWarnaDialog. call this only from OnCreateDialog() or from a background thread.
@@ -41,8 +51,9 @@ public class AmbilWarnaDialog {
 	 */
 	public AmbilWarnaDialog(final Context context, int color, OnAmbilWarnaListener listener) {
 		this.listener = listener;
-		Color.colorToHSV(color, new float[] {currentColorHsv[1], currentColorHsv[2],currentColorHsv[3]});
-
+		Color.colorToHSV(color, currentColorHsv);
+		alpha = Color.alpha(color);
+		logCCH();
 		final View view = LayoutInflater.from(context).inflate(R.layout.ambilwarna_dialog, null);
 		viewHue = view.findViewById(R.id.ambilwarna_viewHue);
 		viewSatVal = (AmbilWarnaKotak) view.findViewById(R.id.ambilwarna_viewSatBri);
@@ -99,7 +110,7 @@ public class AmbilWarnaDialog {
 					}
 					float trans = 255.f - ((255.f / viewHue.getMeasuredHeight()) * y);
 					if (trans == 255.f) {
-						trans = 0.f;
+						trans = 255;
 					}
 					AmbilWarnaDialog.this.setTransparent(trans);
 
@@ -182,6 +193,7 @@ public class AmbilWarnaDialog {
 	}
 
 	protected void moveCursor() {
+		logCCH();
 		float y = viewHue.getMeasuredHeight() - (getHue() * viewHue.getMeasuredHeight() / 360.f);
 		if (y == viewHue.getMeasuredHeight()) y = 0.f;
 		RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) viewCursor.getLayoutParams();
@@ -215,39 +227,40 @@ public class AmbilWarnaDialog {
 	}
 
 	private int getColor() {
-		final int hsv = Color.HSVToColor(new float[] {currentColorHsv[1], currentColorHsv[2],currentColorHsv[3]});
-		return Color.argb((int) this.currentColorHsv[0], Color.red(hsv), Color.green(hsv), Color.blue(hsv));
+		final int hsv = Color.HSVToColor(currentColorHsv);
+		return Color.argb((int) alpha, Color.red(hsv), Color.green(hsv), Color.blue(hsv));
 	}
 
 	private float getHue() {
-		return currentColorHsv[1];
-	}
-
-	private float getTrans() {
 		return currentColorHsv[0];
 	}
 
+	private float getTrans() {
+		return alpha;
+	}
+
 	private float getSat() {
-		return currentColorHsv[2];
+		return currentColorHsv[1];
 	}
 
 	private float getVal() {
-		return currentColorHsv[3];
+		return currentColorHsv[2];
 	}
 
 	private void setHue(float hue) {
-		currentColorHsv[1] = hue;
+		currentColorHsv[0] = hue;
 	}
 
 	private void setSat(float sat) {
-		currentColorHsv[2] = sat;
+		currentColorHsv[1] = sat;
 	}
 
 	private void setTransparent(float trans) {
-		currentColorHsv[0] = trans;
+		alpha = trans;
 	}
+	
 	private void setVal(float val) {
-		currentColorHsv[3] = val;
+		currentColorHsv[2] = val;
 	}
 
 	public void show() {
