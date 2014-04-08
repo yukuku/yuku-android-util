@@ -12,4 +12,6 @@ thumbs.db
 
 Salsa20/obj/
 Snappy/obj/
+
 .idea/workspace.xml
+out/
