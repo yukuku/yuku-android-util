@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.DialogInterface.OnCancelListener;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -100,7 +99,7 @@ public class AmbilWarnaDialog {
 					float y = event.getY();
 					if (y < 0.f) y = 0.f;
 					if (y > viewHue.getMeasuredHeight()) {
-						y = viewHue.getMeasuredHeight() - 0.001f; // to avoid looping from end to start.
+						y = viewHue.getMeasuredHeight() - 0.001f; // to avoid jumping the cursor from bottom to top.
 					}
 					float hue = 360.f - 360.f / viewHue.getMeasuredHeight() * y;
 					if (hue == 360.f) hue = 0.f;
@@ -129,7 +128,7 @@ public class AmbilWarnaDialog {
 						y = 0.f;
 					}
 					if (y > viewAlphaCheckered.getMeasuredHeight()) {
-						y = viewAlphaCheckered.getMeasuredHeight() - 0.001f; // to avoid looping from end to start.
+						y = viewAlphaCheckered.getMeasuredHeight() - 0.001f; // to avoid jumping the cursor from bottom to top.
 					}
 					final int a = Math.round(255.f - ((255.f / viewAlphaCheckered.getMeasuredHeight()) * y));
 					AmbilWarnaDialog.this.setAlpha(a);
@@ -137,9 +136,7 @@ public class AmbilWarnaDialog {
 					// update view
 					moveAlphaCursor();
 					int col = AmbilWarnaDialog.this.getColor();
-					Log.d("WAY", "" + a + " " + Integer.toHexString(col));
 					int c = a << 24 | col & 0x00ffffff;
-					Log.d("WWX", Integer.toHexString(c));
 					viewNewColor.setBackgroundColor(c);
 					return true;
 				}
@@ -238,10 +235,8 @@ public class AmbilWarnaDialog {
 	}
 
 	protected void moveAlphaCursor() {
-		float y = this.viewAlphaCheckered.getMeasuredHeight() - ((this.getAlpha() * this.viewAlphaCheckered.getMeasuredHeight()) / 255.f);
-		if (y == this.viewAlphaCheckered.getMeasuredHeight()) {
-			y = 0.f;
-		}
+		final int measuredHeight = this.viewAlphaCheckered.getMeasuredHeight();
+		float y = measuredHeight - ((this.getAlpha() * measuredHeight) / 255.f);
 		final RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) this.viewAlphaCursor.getLayoutParams();
 		layoutParams.leftMargin = (int) (this.viewAlphaCheckered.getLeft() - Math.floor(this.viewAlphaCursor.getMeasuredWidth() / 2) - this.viewContainer.getPaddingLeft());
 		layoutParams.topMargin = (int) ((this.viewAlphaCheckered.getTop() + y) - Math.floor(this.viewAlphaCursor.getMeasuredHeight() / 2) - this.viewContainer.getPaddingTop());
@@ -279,7 +274,6 @@ public class AmbilWarnaDialog {
 	}
 
 	private void setAlpha(int alpha) {
-		Log.d("setalpha", "" + alpha);
 		this.alpha = alpha;
 	}
 
