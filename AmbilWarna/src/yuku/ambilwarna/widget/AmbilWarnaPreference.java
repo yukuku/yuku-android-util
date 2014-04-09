@@ -23,7 +23,7 @@ public class AmbilWarnaPreference extends Preference {
 		super.onBindView(view);
 
 		// Set our custom views inside the layout
-		final View kotak = view.findViewById(R.id.ambilwarna_pref_widget_kotak);
+		final View kotak = view.findViewById(R.id.ambilwarna_pref_widget_box);
 		if (kotak != null) {
 			kotak.setBackgroundColor(value);
 		}

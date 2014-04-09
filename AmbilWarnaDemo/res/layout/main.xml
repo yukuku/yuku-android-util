@@ -8,11 +8,17 @@
     <TextView
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="AmbilWarna demo"
+            android:id="@+id/text1"
+            android:text="Current color: "
             />
 
     <Button android:text="Open dialog"
             android:id="@+id/button1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <Button android:text="Open dialog (with alpha)"
+            android:id="@+id/button2"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
 </LinearLayout>

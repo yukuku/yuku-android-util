@@ -7,6 +7,7 @@ import android.view.*;
 import android.widget.*;
 
 public class AmbilWarnaDemoActivity extends Activity {
+	TextView text1;
 	int color = 0xffffff00;
 
 	@Override
@@ -14,23 +15,44 @@ public class AmbilWarnaDemoActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
-		findViewById(R.id.button1).setOnClickListener(new View.OnClickListener() {
+		final View button1 = findViewById(R.id.button1);
+		final View button2 = findViewById(R.id.button2);
+		text1 = (TextView) findViewById(R.id.text1);
+		displayColor();
+
+		button1.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				AmbilWarnaDialog dialog = new AmbilWarnaDialog(AmbilWarnaDemoActivity.this, color, new AmbilWarnaDialog.OnAmbilWarnaListener() {
-					@Override
-					public void onOk(AmbilWarnaDialog dialog, int color) {
-						Toast.makeText(getApplicationContext(), "ok color=0x" + Integer.toHexString(color), Toast.LENGTH_SHORT).show();
-						AmbilWarnaDemoActivity.this.color = color;
-					}
-
-					@Override
-					public void onCancel(AmbilWarnaDialog dialog) {
-						Toast.makeText(getApplicationContext(), "cancel", Toast.LENGTH_SHORT).show();
-					}
-				});
-				dialog.show();
+				openDialog(false);
 			}
 		});
+
+		button2.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				openDialog(true);
+			}
+		});
+	}
+
+	void openDialog(boolean supportsAlpha) {
+		AmbilWarnaDialog dialog = new AmbilWarnaDialog(AmbilWarnaDemoActivity.this, color, supportsAlpha, new AmbilWarnaDialog.OnAmbilWarnaListener() {
+			@Override
+			public void onOk(AmbilWarnaDialog dialog, int color) {
+				Toast.makeText(getApplicationContext(), "ok", Toast.LENGTH_SHORT).show();
+				AmbilWarnaDemoActivity.this.color = color;
+				displayColor();
+			}
+
+			@Override
+			public void onCancel(AmbilWarnaDialog dialog) {
+				Toast.makeText(getApplicationContext(), "cancel", Toast.LENGTH_SHORT).show();
+			}
+		});
+		dialog.show();
+	}
+
+	void displayColor() {
+		text1.setText(String.format("Current color: 0x%08x", color));
 	}
 }
