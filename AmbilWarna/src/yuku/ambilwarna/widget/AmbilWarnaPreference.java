@@ -12,10 +12,15 @@ import yuku.ambilwarna.AmbilWarnaDialog;
 import yuku.ambilwarna.R;
 
 public class AmbilWarnaPreference extends Preference {
+	private final boolean supportsAlpha;
 	int value;
 
 	public AmbilWarnaPreference(Context context, AttributeSet attrs) {
 		super(context, attrs);
+
+		final TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.AmbilWarnaPreference);
+		supportsAlpha = ta.getBoolean(R.styleable.AmbilWarnaPreference_supportsAlpha, false);
+
 		setWidgetLayoutResource(R.layout.ambilwarna_pref_widget);
 	}
 
@@ -23,14 +28,14 @@ public class AmbilWarnaPreference extends Preference {
 		super.onBindView(view);
 
 		// Set our custom views inside the layout
-		final View kotak = view.findViewById(R.id.ambilwarna_pref_widget_box);
-		if (kotak != null) {
-			kotak.setBackgroundColor(value);
+		final View box = view.findViewById(R.id.ambilwarna_pref_widget_box);
+		if (box != null) {
+			box.setBackgroundColor(value);
 		}
 	}
 
 	@Override protected void onClick() {
-		new AmbilWarnaDialog(getContext(), value, new AmbilWarnaDialog.OnAmbilWarnaListener() {
+		new AmbilWarnaDialog(getContext(), value, supportsAlpha, new AmbilWarnaDialog.OnAmbilWarnaListener() {
 			@Override public void onOk(AmbilWarnaDialog dialog, int color) {
 				if (!callChangeListener(color)) return; // They don't want the value to be set
 				value = color;

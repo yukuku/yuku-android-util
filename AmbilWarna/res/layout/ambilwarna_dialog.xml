@@ -38,7 +38,7 @@
             android:layout_marginLeft="@dimen/ambilwarna_spacer"
             android:layout_toRightOf="@id/ambilwarna_viewHue"
             android:scaleType="fitXY"
-            android:src="@drawable/ambilwarna_transparent" />
+            android:src="@drawable/ambilwarna_alphacheckered_tiled" />
 
         <View
             android:id="@+id/ambilwarna_overlay"
@@ -85,7 +85,7 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:background="@drawable/ambilwarna_transparent" />
+                    android:background="@drawable/ambilwarna_alphacheckered_tiled" />
 
                 <View
                     android:id="@+id/ambilwarna_oldColor"
@@ -108,7 +108,7 @@
                 <View
                     android:layout_width="fill_parent"
                     android:layout_height="fill_parent"
-                    android:background="@drawable/ambilwarna_transparent" />
+                    android:background="@drawable/ambilwarna_alphacheckered_tiled" />
 
                 <View
                     android:id="@+id/ambilwarna_newColor"

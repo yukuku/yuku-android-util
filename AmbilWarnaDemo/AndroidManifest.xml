@@ -15,6 +15,7 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".AmbilWarnaDemoPreferenceActivity" />
     </application>
 
     <supports-screens android:anyDensity="true"

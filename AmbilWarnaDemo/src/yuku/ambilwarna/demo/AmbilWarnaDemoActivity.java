@@ -1,10 +1,12 @@
 package yuku.ambilwarna.demo;
 
-import yuku.ambilwarna.*;
-import android.app.*;
-import android.os.*;
-import android.view.*;
-import android.widget.*;
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.TextView;
+import android.widget.Toast;
+import yuku.ambilwarna.AmbilWarnaDialog;
 
 public class AmbilWarnaDemoActivity extends Activity {
 	TextView text1;
@@ -17,6 +19,7 @@ public class AmbilWarnaDemoActivity extends Activity {
 
 		final View button1 = findViewById(R.id.button1);
 		final View button2 = findViewById(R.id.button2);
+		final View button3 = findViewById(R.id.button3);
 		text1 = (TextView) findViewById(R.id.text1);
 		displayColor();
 
@@ -31,6 +34,13 @@ public class AmbilWarnaDemoActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				openDialog(true);
+			}
+		});
+
+		button3.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(getApplicationContext(), AmbilWarnaDemoPreferenceActivity.class));
 			}
 		});
 	}
