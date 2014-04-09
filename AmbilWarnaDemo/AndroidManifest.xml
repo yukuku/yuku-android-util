@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+          package="yuku.ambilwarna.demo"
+          android:versionCode="2"
+          android:versionName="2.0">
+
+    <uses-sdk android:minSdkVersion="4"
+              android:targetSdkVersion="19"/>
+
+    <application android:icon="@drawable/icon" android:label="AmbilWarna Demo">
+        <activity android:name=".AmbilWarnaDemoActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN"/>
+                <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+        </activity>
+
+    </application>
+
+    <supports-screens android:anyDensity="true"
+                      android:smallScreens="true"
+                      android:normalScreens="true"
+                      android:largeScreens="true"
+                      android:resizeable="true"/>
+</manifest> 
