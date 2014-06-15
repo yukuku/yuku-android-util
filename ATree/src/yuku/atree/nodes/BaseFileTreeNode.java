@@ -1,21 +1,28 @@
 package yuku.atree.nodes;
 
-import java.io.*;
-import java.util.*;
+import yuku.atree.BaseMutableTreeNode;
 
-import yuku.atree.*;
+import java.io.File;
+import java.io.FileFilter;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.HashMap;
 
 public abstract class BaseFileTreeNode extends BaseMutableTreeNode implements Comparable<BaseFileTreeNode> {
 	public static final String TAG = BaseFileTreeNode.class.getSimpleName();
 	protected final File file;
-	protected final File[] virtualChildren;
+	protected final VirtualChild[] virtualChildren;
+
+	public static class VirtualChild {
+		public File file;
+	}
 
 	public BaseFileTreeNode(File file) {
 		this.file = file;
 		this.virtualChildren = null;
 	}
 
-	public BaseFileTreeNode(File[] virtualChildren) {
+	public BaseFileTreeNode(VirtualChild[] virtualChildren) {
 		this.file = null;
 		this.virtualChildren = virtualChildren;
 	}
@@ -25,11 +32,16 @@ public abstract class BaseFileTreeNode extends BaseMutableTreeNode implements Co
 
 		if (expanded) {
 			File[] files;
+			boolean virtual = false;
 			if (file != null && file.isDirectory()) {
 				files = file.listFiles(fileFilter);
 				if (files != null) Arrays.sort(files, fileComparator);
 			} else if (virtualChildren != null) {
-				files = virtualChildren;
+				files = new File[virtualChildren.length];
+				for (int i = 0; i < virtualChildren.length; i++) {
+					files[i] = virtualChildren[i].file;
+				}
+				virtual = true;
 			} else {
 				files = null;
 			}
@@ -44,13 +56,14 @@ public abstract class BaseFileTreeNode extends BaseMutableTreeNode implements Co
 				}
 				
 				this.removeAllChildren();
-				
-				for (File file : files) {
-					BaseFileTreeNode existingNode = existing.get(file.getName());
+
+				for (int i = 0; i < files.length; i++) {
+					final File file = files[i];
+					final BaseFileTreeNode existingNode = existing.get(file.getName());
 					if (existingNode != null) {
 						this.add(existingNode);
 					} else {
-						this.add(generateForFile(file));
+						this.add(virtual? generateForVirtualChild(virtualChildren[i]): generateForFile(file));
 					}
 				}
 			}
@@ -113,6 +126,10 @@ public abstract class BaseFileTreeNode extends BaseMutableTreeNode implements Co
 	}
 
 	protected abstract BaseFileTreeNode generateForFile(File file);
+
+	protected BaseFileTreeNode generateForVirtualChild(VirtualChild virtualChild) {
+		return generateForFile(virtualChild.file); // default implementation falls back to normal file
+	}
 	
 	protected boolean showDirectoriesOnly() {
 		return false;
@@ -126,7 +143,7 @@ public abstract class BaseFileTreeNode extends BaseMutableTreeNode implements Co
 		return file;
 	}
 	
-	public File[] getVirtualChildren() {
+	public VirtualChild[] getVirtualChildren() {
 		return virtualChildren;
 	}
 }

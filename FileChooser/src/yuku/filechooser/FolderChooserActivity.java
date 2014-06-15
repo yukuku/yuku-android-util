@@ -25,13 +25,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.BufferType;
-
-import java.io.File;
-import java.util.Arrays;
-
 import yuku.atree.TreeAdapter;
 import yuku.atree.TreeNodeIconType;
 import yuku.atree.nodes.BaseFileTreeNode;
+
+import java.io.File;
+import java.util.Arrays;
 
 public class FolderChooserActivity extends Activity {
 	static final String EXTRA_config = "config"; //$NON-NLS-1$
@@ -71,8 +70,8 @@ public class FolderChooserActivity extends Activity {
 		adapter = new TreeAdapter();
 		tree.setAdapter(adapter);
 		tree.setOnItemClickListener(tree_itemClick);
-		
-		perm_writeExt = checkCallingOrSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+		final int perm_writeExt = checkCallingOrSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
 		if (perm_writeExt == PackageManager.PERMISSION_GRANTED) {
 			tree.setOnItemLongClickListener(tree_itemLongClick);
 		}
@@ -80,19 +79,21 @@ public class FolderChooserActivity extends Activity {
 		bOk.setOnClickListener(bOk_click);
 
 		setSelectedDir(null);
-		
+
 		if (config.roots == null || config.roots.size() == 0) {
 			config.roots = Arrays.asList(Environment.getExternalStorageDirectory().getAbsolutePath());
 		}
-		
-		File[] children = new File[config.roots.size()];
-		for (int i = 0; i < config.roots.size(); i++) {
-			children[i] = new File(config.roots.get(i));
+
+		final BaseFileTreeNode.VirtualChild[] children = new BaseFileTreeNode.VirtualChild[config.roots.size()];
+		for (int i = 0; i < children.length; i++) {
+			final BaseFileTreeNode.VirtualChild child = children[i];
+			child.file = new File(config.roots.get(i));
 		}
-		FileTreeNode root = new FileTreeNode("root", children);
+
+		FileTreeNode root = new FileTreeNode(children);
 		adapter.setRootVisible(false);
 		root.setExpanded(true);
-		
+
 		if (children.length == 1 && config.expandSingularRoot) {
 			FileTreeNode childNode = root.getChildAt(0);
 			childNode.setExpanded(true);
@@ -183,25 +184,30 @@ public class FolderChooserActivity extends Activity {
 			finish();
 		}
 	};
-	private int perm_writeExt;
 
 	class FileTreeNode extends BaseFileTreeNode {
-		private String label;
+
+		private float density;
 
 		public FileTreeNode(File file) {
 			super(file);
+			init();
 		}
-		
-		public FileTreeNode(String label, File[] virtualChildren) {
+
+		public FileTreeNode(VirtualChild[] virtualChildren) {
 			super(virtualChildren);
-			this.label = label;
+			init();
+		}
+
+		void init() {
+			density = getResources().getDisplayMetrics().density;
 		}
 
 		@Override public View getView(int position, View convertView, ViewGroup parent, int level, TreeNodeIconType iconType, int[] lines) {
 			TextView res = (TextView) (convertView != null? convertView: getLayoutInflater().inflate(android.R.layout.simple_list_item_1, parent, false));
-			
-			res.setPadding((int) ((getResources().getDisplayMetrics().density) * (20 * (level - 1) + 6)), 0, 0, 0);
-			res.setText(label != null? label: file.getName());
+
+			res.setPadding((int) (density * (20 * (level - 1) + 6)), 0, 0, 0);
+			res.setText(file.getName());
 			res.setCompoundDrawablesWithIntrinsicBounds(file.isDirectory()? R.drawable.filechooser_folder: R.drawable.filechooser_file, 0, 0, 0);
 			
 			return res;
