@@ -52,6 +52,8 @@ public class Digester {
 	}
 	
 	public static String toHex(byte[] a) {
+		if (a == null) return null;
+
 		char[] d = new char[a.length * 2];
 		int pos = 0;
 		
