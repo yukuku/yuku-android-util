@@ -37,7 +37,7 @@ public class Digester {
 			if (is != null) {
 				try {
 					is.close();
-				} catch (IOException e) {
+				} catch (IOException ignored) {
 				}
 			}
 		}
