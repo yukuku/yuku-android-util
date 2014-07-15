@@ -7,13 +7,12 @@ import android.os.Build;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import yuku.afw.App;
+import yuku.afw.D;
 
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import yuku.afw.App;
-import yuku.afw.D;
 
 public class Preferences {
 	private static final String TAG = Preferences.class.getSimpleName();
@@ -159,6 +158,16 @@ public class Preferences {
 		commitIfNotHeld();
 		Log.d(TAG, key + " = (bool) " + val); //$NON-NLS-1$
 	}
+
+	public static boolean contains(final Enum<?> key) {
+		SharedPreferences pref = read();
+		return pref.contains(key.toString());
+	}
+
+	public static boolean contains(final String key) {
+		SharedPreferences pref = read();
+		return pref.contains(key);
+	}
 	
 	public static void remove(Enum<?> key) {
 		remove(key.toString());
@@ -166,7 +175,7 @@ public class Preferences {
 	
 	public static void remove(String key) {
 		SharedPreferences pref = read();
-		getEditor(pref).remove(key.toString());
+		getEditor(pref).remove(key);
 		commitIfNotHeld();
 		Log.d(TAG, key + " removed"); //$NON-NLS-1$
 	}
@@ -197,7 +206,11 @@ public class Preferences {
 		held--;
 		if (held == 0) {
 			if (currentEditor != null) {
-				currentEditor.commit();
+				if (Build.VERSION.SDK_INT >= 9) {
+					currentEditor.apply();
+				} else {
+					currentEditor.commit();
+				}
 				currentEditor = null;
 			}
 		}
