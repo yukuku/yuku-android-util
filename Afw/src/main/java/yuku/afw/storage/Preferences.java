@@ -114,7 +114,7 @@ public class Preferences {
 		SharedPreferences pref = read();
 		getEditor(pref).putInt(key, val);
 		commitIfNotHeld();
-		Log.d(TAG, key + " = (int) " + val); //$NON-NLS-1$
+		if (BuildConfig.DEBUG) Log.d(TAG, key + " = (int) " + val);
 	}
 	
 	public static void setFloat(Enum<?> key, float val) {
@@ -125,7 +125,7 @@ public class Preferences {
 		SharedPreferences pref = read();
 		getEditor(pref).putFloat(key, val);
 		commitIfNotHeld();
-		Log.d(TAG, key + " = (float) " + val); //$NON-NLS-1$
+		if (BuildConfig.DEBUG) Log.d(TAG, key + " = (float) " + val);
 	}
 	
 	public static void setLong(Enum<?> key, long val) {
@@ -136,7 +136,7 @@ public class Preferences {
 		SharedPreferences pref = read();
 		getEditor(pref).putLong(key, val);
 		commitIfNotHeld();
-		Log.d(TAG, key + " = (long) " + val); //$NON-NLS-1$
+		if (BuildConfig.DEBUG) Log.d(TAG, key + " = (long) " + val);
 	}
 	
 	public static void setString(Enum<?> key, String val) {
@@ -147,7 +147,7 @@ public class Preferences {
 		SharedPreferences pref = read();
 		getEditor(pref).putString(key, val);
 		commitIfNotHeld();
-		Log.d(TAG, key + " = (string) " + val); //$NON-NLS-1$
+		if (BuildConfig.DEBUG) Log.d(TAG, key + " = (string) " + val);
 	}
 	
 	public static void setBoolean(Enum<?> key, boolean val) {
@@ -158,7 +158,7 @@ public class Preferences {
 		SharedPreferences pref = read();
 		getEditor(pref).putBoolean(key, val);
 		commitIfNotHeld();
-		Log.d(TAG, key + " = (bool) " + val); //$NON-NLS-1$
+		if (BuildConfig.DEBUG) Log.d(TAG, key + " = (bool) " + val);
 	}
 
 	public static boolean contains(final Enum<?> key) {
@@ -179,7 +179,7 @@ public class Preferences {
 		SharedPreferences pref = read();
 		getEditor(pref).remove(key);
 		commitIfNotHeld();
-		Log.d(TAG, key + " removed"); //$NON-NLS-1$
+		if (BuildConfig.DEBUG) Log.d(TAG, key + " removed");
 	}
 	
 	@TargetApi(9) private synchronized static void commitIfNotHeld() {
@@ -236,7 +236,7 @@ public class Preferences {
 			long start = 0;
 			if (BuildConfig.DEBUG) start = SystemClock.uptimeMillis();
 			res = PreferenceManager.getDefaultSharedPreferences(App.context);
-			if (BuildConfig.DEBUG) Log.d(TAG, "Preferences was read from disk in ms: " + (SystemClock.uptimeMillis() - start)); //$NON-NLS-1$
+			if (BuildConfig.DEBUG) Log.d(TAG, "Preferences was read from disk in " + (SystemClock.uptimeMillis() - start) + " ms");
 			dirty = false;
 
 			// re-register observers if the SharedPreferences object changes
