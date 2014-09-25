@@ -8,7 +8,7 @@ import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import yuku.afw.App;
-import yuku.afw.D;
+import yuku.afw.BuildConfig;
 
 import java.util.HashSet;
 import java.util.Map;
@@ -234,9 +234,9 @@ public class Preferences {
 		SharedPreferences res;
 		if (dirty || cache == null) {
 			long start = 0;
-			if (D.EBUG) start = SystemClock.uptimeMillis();
+			if (BuildConfig.DEBUG) start = SystemClock.uptimeMillis();
 			res = PreferenceManager.getDefaultSharedPreferences(App.context);
-			if (D.EBUG) Log.d(TAG, "Preferences was read from disk in ms: " + (SystemClock.uptimeMillis() - start)); //$NON-NLS-1$
+			if (BuildConfig.DEBUG) Log.d(TAG, "Preferences was read from disk in ms: " + (SystemClock.uptimeMillis() - start)); //$NON-NLS-1$
 			dirty = false;
 
 			// re-register observers if the SharedPreferences object changes
