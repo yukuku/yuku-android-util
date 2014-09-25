@@ -13,6 +13,7 @@ import yuku.afw.D;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.WeakHashMap;
 
 public class Preferences {
 	private static final String TAG = Preferences.class.getSimpleName();
@@ -21,6 +22,7 @@ public class Preferences {
 	private static boolean dirty = true;
 	private static Editor currentEditor;
 	private static int held = 0;
+	private static WeakHashMap<SharedPreferences.OnSharedPreferenceChangeListener, Void> observers = new WeakHashMap<>();
 	
 	public static void invalidate() {
 		dirty = true;
@@ -216,6 +218,18 @@ public class Preferences {
 		}
 	}
 
+	public synchronized static void registerObserver(final SharedPreferences.OnSharedPreferenceChangeListener observer) {
+		SharedPreferences pref = read();
+		pref.registerOnSharedPreferenceChangeListener(observer);
+		observers.put(observer, null);
+	}
+
+	public synchronized static void unregisterObserver(final SharedPreferences.OnSharedPreferenceChangeListener observer) {
+		SharedPreferences pref = read();
+		pref.unregisterOnSharedPreferenceChangeListener(observer);
+		observers.remove(observer);
+	}
+
 	private synchronized static SharedPreferences read() {
 		SharedPreferences res;
 		if (dirty || cache == null) {
@@ -224,6 +238,15 @@ public class Preferences {
 			res = PreferenceManager.getDefaultSharedPreferences(App.context);
 			if (D.EBUG) Log.d(TAG, "Preferences was read from disk in ms: " + (SystemClock.uptimeMillis() - start)); //$NON-NLS-1$
 			dirty = false;
+
+			// re-register observers if the SharedPreferences object changes
+			if (cache != null && res != cache && observers.size() > 0) {
+				for (final SharedPreferences.OnSharedPreferenceChangeListener observer : observers.keySet()) {
+					cache.unregisterOnSharedPreferenceChangeListener(observer);
+					res.registerOnSharedPreferenceChangeListener(observer);
+				}
+			}
+
 			cache = res;
 		} else {
 			res = cache;
